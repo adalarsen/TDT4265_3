@@ -68,7 +68,7 @@ class ExampleModel(nn.Module):
         Args:
             x: Input image, shape: [batch_size, 3, 32, 32]
         """
-        
+
 
         # Run image through convolutional layers
         x = self.feature_extractor(x)
@@ -87,7 +87,7 @@ class Trainer:
         Set hyperparameters, architecture, tracking variables etc.
         """
         # Define hyperparameters
-        self.epochs = 100
+        self.epochs = 10
         self.batch_size = 64
         self.learning_rate = 5e-2
         self.early_stop_count = 4

@@ -3,6 +3,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import torch
 import numpy as np
 from config import *
+import PIL
 
 mean = (0.4914, 0.4822, 0.4465)
 std = (0.2023, 0.1994, 0.2010)

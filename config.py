@@ -1,4 +1,4 @@
 
-data_augmentation = 0
+data_augmentation = 1
 adam_optimizer = 0
-l2l2_regularization = 0
+l2_regularization = 0
