@@ -2,17 +2,26 @@ from torchvision import transforms, datasets
 from torch.utils.data.sampler import SubsetRandomSampler
 import torch
 import numpy as np
+from config import *
 
 mean = (0.4914, 0.4822, 0.4465)
 std = (0.2023, 0.1994, 0.2010)
 
 
 def load_cifar10(batch_size, validation_fraction=0.1):
-    transform = [
-        transforms.ToTensor(),
-        transforms.Normalize(mean, std)
-    ]
-    transform = transforms.Compose(transform)
+    if data_augmentation:
+        transform = transforms.Compose([
+            transforms.ColorJitter(hue=.05, saturation=.05),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomRotation(20, resample=PIL.Image.BILINEAR),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std)
+        ])
+    else:
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std)
+        ])
     data_train = datasets.CIFAR10('data/cifar10',
                                   train=True,
                                   download=True,

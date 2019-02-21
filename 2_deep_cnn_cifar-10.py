@@ -4,6 +4,7 @@ import torch
 from torch import nn
 from dataloaders import load_cifar10
 from utils import to_cuda, compute_loss_and_accuracy
+from config import *
 
 
 class ExampleModel(nn.Module):
@@ -59,6 +60,7 @@ class ExampleModel(nn.Module):
         # included with nn.CrossEntropyLoss
         self.classifier = nn.Sequential(
             nn.Linear(self.num_output_features, 64),
+            nn.ReLU(),
             nn.Linear(64, num_classes),
         )
 
@@ -68,7 +70,7 @@ class ExampleModel(nn.Module):
         Args:
             x: Input image, shape: [batch_size, 3, 32, 32]
         """
-        
+
 
         # Run image through convolutional layers
         x = self.feature_extractor(x)
@@ -104,6 +106,8 @@ class Trainer:
         # Define our optimizer. SGD = Stochastich Gradient Descent
         self.optimizer = torch.optim.SGD(self.model.parameters(),
                                          self.learning_rate)
+        if adam_optimizer:
+            self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate, self.weight_decay=l2_regularization)
 
         # Load our dataset
         self.dataloader_train, self.dataloader_val, self.dataloader_test = load_cifar10(self.batch_size)
