@@ -5,191 +5,7 @@ from torch import nn
 from dataloaders import load_cifar10
 from utils import to_cuda, compute_loss_and_accuracy
 from config import *
-
-
-class ExampleModel(nn.Module):
-
-    def __init__(self,
-                 image_channels,
-                 num_classes):
-        """
-            Is called when model is initialized.
-            Args:
-                image_channels. Number of color channels in image (3)
-                num_classes: Number of classes we want to predict (10)
-        """
-        super().__init__()
-        num_filters = 32  # Set number of filters in first conv layer
-
-        # Define the convolutional layers
-        self.feature_extractor = nn.Sequential(
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=num_filters,
-                kernel_size=5,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout(0.3),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(
-                in_channels=num_filters,
-                out_channels=64,
-                kernel_size=5,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout(0.3),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(
-                in_channels=64,
-                out_channels=128,
-                kernel_size=5,
-                stride=1,
-                padding=2
-            ),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.ReLU()
-        )
-        # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 128*4*4
-        # Initialize our last fully connected layer
-        # Inputs all extracted features from the convolutional layers
-        # Outputs num_classes predictions, 1 for each class.
-        # There is no need for softmax activation function, as this is
-        # included with nn.CrossEntropyLoss
-        self.classifier = nn.Sequential(
-            nn.Linear(self.num_output_features, 64),
-            nn.ReLU(),
-            nn.Linear(64, num_classes),
-        )
-
-    def forward(self, x):
-        """
-        Performs a forward pass through the model
-        Args:
-            x: Input image, shape: [batch_size, 3, 32, 32]
-        """
-
-
-        # Run image through convolutional layers
-        x = self.feature_extractor(x)
-        # Reshape our input to (batch_size, num_output_features)
-        x = x.view(-1, self.num_output_features) # Flatten
-        # Forward pass through the fully-connected layers.
-        x = self.classifier(x)
-        return x
-
-class VinnerModel(nn.Module):
-
-    def __init__(self,
-                 image_channels,
-                 num_classes):
-        """
-            Is called when model is initialized.
-            Args:
-                image_channels. Number of color channels in image (3)
-                num_classes: Number of classes we want to predict (10)
-        """
-        super().__init__()
-        num_filters = 32  # Set number of filters in first conv layer
-
-        # Define the convolutional layers
-        self.feature_extractor = nn.Sequential(
-            nn.Conv2d(
-                in_channels=image_channels,
-                out_channels=num_filters,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(32),
-            nn.Conv2d(
-                in_channels=num_filters,
-                out_channels=num_filters,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(32),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout(p=0.2),
-            nn.Conv2d(
-                in_channels=num_filters,
-                out_channels=64,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.Conv2d(
-                in_channels=64,
-                out_channels=64,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(64),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Dropout(p=0.3),
-            nn.Conv2d(
-                in_channels=64,
-                out_channels=128,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(128),
-            nn.Conv2d(
-                in_channels=128,
-                out_channels=128,
-                kernel_size=3,
-                stride=1,
-                padding=2
-            ),
-            nn.ReLU(),
-            nn.BatchNorm2d(128),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-        )
-        # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
-        self.num_output_features = 128*7*7
-        # Initialize our last fully connected layer
-        # Inputs all extracted features from the convolutional layers
-        # Outputs num_classes predictions, 1 for each class.
-        # There is no need for softmax activation function, as this is
-        # included with nn.CrossEntropyLoss
-        self.classifier = nn.Sequential(
-            nn.Linear(self.num_output_features, 2048),
-            nn.ReLU(),
-            nn.Linear(2048, num_classes),
-        )
-
-    def forward(self, x):
-        """
-        Performs a forward pass through the model
-        Args:
-            x: Input image, shape: [batch_size, 3, 32, 32]
-        """
-
-
-        # Run image through convolutional layers
-        x = self.feature_extractor(x)
-        # Reshape our input to (batch_size, num_output_features)
-        x = x.view(-1, self.num_output_features) # Flatten
-        
-        # Forward pass through the fully-connected layers.
-        x = self.classifier(x)
-        return x
-
+from models import *
 
 class Trainer:
 
@@ -199,9 +15,9 @@ class Trainer:
         Set hyperparameters, architecture, tracking variables etc.
         """
         # Define hyperparameters
-        self.epochs = 10
-        self.batch_size = 64
-        self.learning_rate = 5e-2
+        self.epochs = 2
+        self.batch_size = 32
+        self.learning_rate = 5e-4
         self.early_stop_count = 4
 
         # Architecture
@@ -209,14 +25,15 @@ class Trainer:
         # Since we are doing multi-class classification, we use the CrossEntropyLoss
         self.loss_criterion = nn.CrossEntropyLoss()
         # Initialize the mode
-        self.model = VinnerModel(image_channels=3, num_classes=10)
+        self.model = Tl_Model()
+        #self.model = Tl_Model(image_channels=3, num_classes=10)
         # Transfer model to GPU VRAM, if possible.
         self.model = to_cuda(self.model)
 
         # Define our optimizer. SGD = Stochastich Gradient Descent
         self.optimizer = torch.optim.SGD(self.model.parameters(),
                                          self.learning_rate)
-        print(adam_optimizer)
+
         if adam_optimizer:
             self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate)
 
@@ -316,12 +133,12 @@ class Trainer:
                     if self.should_early_stop():
                         print("Early stopping.")
                         return
+        torch.save(self.model, "/home/shomea/a/adasl/Documents/Datasyn/tdt4265_3/model_res.pt")
 
 
 if __name__ == "__main__":
     trainer = Trainer()
     trainer.train()
-
     os.makedirs("plots", exist_ok=True)
     # Save plots and show them
     plt.figure(figsize=(12, 8))
@@ -344,3 +161,5 @@ if __name__ == "__main__":
 
     print("Final test accuracy:", trainer.TEST_ACC[-trainer.early_stop_count])
     print("Final validation accuracy:", trainer.VALIDATION_ACC[-trainer.early_stop_count])
+
+    
