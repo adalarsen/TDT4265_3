@@ -136,7 +136,13 @@ class Trainer:
         torch.save(self.model, "/home/shomea/a/adasl/Documents/Datasyn/tdt4265_3/model_res.pt")
 
 
+
 if __name__ == "__main__":
+    model = torch.load("/home/shomea/a/adasl/Documents/Datasyn/tdt4265_3/model_res.pt")
+    model.eval()
+
+
+    '''
     trainer = Trainer()
     trainer.train()
     os.makedirs("plots", exist_ok=True)
@@ -161,5 +167,4 @@ if __name__ == "__main__":
 
     print("Final test accuracy:", trainer.TEST_ACC[-trainer.early_stop_count])
     print("Final validation accuracy:", trainer.VALIDATION_ACC[-trainer.early_stop_count])
-
-    
+    '''
