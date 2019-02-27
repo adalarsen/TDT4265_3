@@ -17,7 +17,7 @@ class Trainer:
         Set hyperparameters, architecture, tracking variables etc.
         """
         # Define hyperparameters
-        self.epochs = 10
+        self.epochs = 5
         self.batch_size = 64
         self.learning_rate = 5e-2
         self.early_stop_count = 4
@@ -128,12 +128,12 @@ class Trainer:
                 # Reset all computed gradients to 0
                 self.optimizer.zero_grad()
                  # Compute loss/accuracy for all three datasets.
-                if batch_it % self.validation_check == 0:
-                    self.validation_epoch()
-                    # Check early stopping criteria.
-                    if self.should_early_stop():
-                        print("Early stopping.")
-                        return
+            #if batch_it % self.validation_check == 0:
+            self.validation_epoch()
+            # Check early stopping criteria.
+            if self.should_early_stop():
+                print("Early stopping.")
+                return
 
 
 if __name__ == "__main__":

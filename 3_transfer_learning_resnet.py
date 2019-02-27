@@ -6,6 +6,7 @@ from dataloaders import load_cifar10
 from utils import to_cuda, compute_loss_and_accuracy
 from config import *
 from models import *
+import numpy as np
 
 class Trainer:
 
@@ -15,7 +16,7 @@ class Trainer:
         Set hyperparameters, architecture, tracking variables etc.
         """
         # Define hyperparameters
-        self.epochs = 2
+        self.epochs = 5
         self.batch_size = 32
         self.learning_rate = 5e-4
         self.early_stop_count = 4
@@ -34,8 +35,8 @@ class Trainer:
         self.optimizer = torch.optim.SGD(self.model.parameters(),
                                          self.learning_rate)
 
-        if adam_optimizer:
-            self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate)
+        #if adam_optimizer:
+        self.optimizer = torch.optim.Adam(self.model.parameters(), self.learning_rate)
 
         # Load our dataset
         self.dataloader_train, self.dataloader_val, self.dataloader_test = load_cifar10(self.batch_size)
@@ -127,12 +128,12 @@ class Trainer:
                 # Reset all computed gradients to 0
                 self.optimizer.zero_grad()
                  # Compute loss/accuracy for all three datasets.
-                if batch_it % self.validation_check == 0:
-                    self.validation_epoch()
-                    # Check early stopping criteria.
-                    if self.should_early_stop():
-                        print("Early stopping.")
-                        return
+        #if batch_it % self.validation_check == 0:
+            self.validation_epoch()
+            # Check early stopping criteria.
+            if self.should_early_stop():
+                print("Early stopping.")
+                return
         torch.save(self.model, "/home/shomea/a/adasl/Documents/Datasyn/tdt4265_3/model_res.pt")
 
 
@@ -142,7 +143,6 @@ if __name__ == "__main__":
     model.eval()
 
 
-    '''
     trainer = Trainer()
     trainer.train()
     os.makedirs("plots", exist_ok=True)
@@ -167,4 +167,16 @@ if __name__ == "__main__":
 
     print("Final test accuracy:", trainer.TEST_ACC[-trainer.early_stop_count])
     print("Final validation accuracy:", trainer.VALIDATION_ACC[-trainer.early_stop_count])
-    '''
+
+    validation_loss = np.load("best_model.npy")
+    train_loss = np.load("best_model_train.npy")
+
+    plt.figure(figsize=(12, 8))
+    plt.title("Cross Entropy Loss")
+    plt.plot(trainer.VALIDATION_LOSS, label="ResNet18 Validation loss")
+    plt.plot(trainer.TRAIN_LOSS, label="ResNet18 Training loss")
+    plt.plot(validation_loss, label="Selfmade Model Validation loss")
+    plt.plot(train_loss, label="Selfmade Model Training loss")
+    plt.legend()
+    plt.savefig(os.path.join("plots", "comparison.png"))
+    plt.show()
