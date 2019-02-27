@@ -6,6 +6,7 @@ from dataloaders import load_cifar10
 from utils import to_cuda, compute_loss_and_accuracy
 from config import *
 from models import *
+import numpy as np
 
 
 class Trainer:
@@ -161,3 +162,5 @@ if __name__ == "__main__":
 
     print("Final test accuracy:", trainer.TEST_ACC[-trainer.early_stop_count])
     print("Final validation accuracy:", trainer.VALIDATION_ACC[-trainer.early_stop_count])
+    np.save("best_model.npy", np.array(trainer.VALIDATION_LOSS))
+    np.save("best_model_train.npy", np.array(trainer.TRAIN_LOSS))
