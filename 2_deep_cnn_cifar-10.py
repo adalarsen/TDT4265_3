@@ -17,8 +17,8 @@ class Trainer:
         Set hyperparameters, architecture, tracking variables etc.
         """
         # Define hyperparameters
-        self.epochs = 5
-        self.batch_size = 64
+        self.epochs = 10
+        self.batch_size = 32
         self.learning_rate = 5e-2
         self.early_stop_count = 4
 
@@ -162,5 +162,9 @@ if __name__ == "__main__":
 
     print("Final test accuracy:", trainer.TEST_ACC[-trainer.early_stop_count])
     print("Final validation accuracy:", trainer.VALIDATION_ACC[-trainer.early_stop_count])
+    print("Final test loss:", trainer.TEST_LOSS[-trainer.early_stop_count])
+    print("Final train loss:", trainer.TRAIN_LOSS[-trainer.early_stop_count])
+    print("Final validation loss:", trainer.VALIDATION_LOSS[-trainer.early_stop_count])
+    print("Final train accuracy:", trainer.TRAIN_ACC[-trainer.early_stop_count])
     np.save("best_model.npy", np.array(trainer.VALIDATION_LOSS))
     np.save("best_model_train.npy", np.array(trainer.TRAIN_LOSS))

@@ -109,6 +109,7 @@ class VinnerModel(nn.Module):
             ),
             nn.ReLU(),
             nn.BatchNorm2d(32),
+            nn.Dropout(p=0.2),
             nn.Conv2d(
                 in_channels=num_filters,
                 out_channels=num_filters,
@@ -129,6 +130,7 @@ class VinnerModel(nn.Module):
             ),
             nn.ReLU(),
             nn.BatchNorm2d(64),
+            nn.Dropout(p=0.3),
             nn.Conv2d(
                 in_channels=64,
                 out_channels=64,

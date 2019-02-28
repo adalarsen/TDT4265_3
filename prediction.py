@@ -12,6 +12,8 @@ from torchvision import transforms
 mean = (0.4914, 0.4822, 0.4465)
 std = (0.2023, 0.1994, 0.2010)
 
+task = 3
+
 
 img = Image.open("horse.jpeg")
 img = transforms.ToTensor()(img)
@@ -23,17 +25,20 @@ layer1 = torchvision.models.resnet18(pretrained=True).conv1
 model = torchvision.models.resnet18(pretrained=True)
 modules = list(model.children())[:-2]
 
-'''
-init = True
-for i in modules:
-    if init:
-        pred = i(img)
-        init = False
-    else:
-        pred = i(pred)
-'''
-pred = layer1.weight.data
+if task==2:
+    init = True
+    for i in modules:
+        if init:
+            pred = i(img)
+            init = False
+        else:
+            pred = i(pred)
 
+if task==3:
+    pred = layer1.weight.data
+
+if task==1:
+    pred = layer1(img)
 print(pred.shape)
 #prediction = pred[0][1].view(7,7, 3)
 #prediction = pred.view(7,7, 3)
@@ -44,51 +49,34 @@ print(pred.shape)
 fig=plt.figure(figsize=(10, 10))
 columns = 8
 rows = 8
-'''
-for i in range(1, columns*rows +1):
-    #img =  pred[0][i].view(7, 7)
-    img =  pred[i-1].view(7, 7, 3)
-    fig.add_subplot(rows, columns, i)
-    plt.axis('off')
-    plt.subplots_adjust(wspace=0, hspace=0)
-    plt.imshow(img.detach().numpy())
-plt.show()
-'''
-#torchvision.utils.save_image(prediction, 'filters.png')
 
-for i in range(1, columns*rows +1):
-    #img =  pred[0][i].view(7, 7)
-    img =  pred[i-1].numpy().transpose(1,2,0)
-    fig.add_subplot(rows, columns, i)
-    plt.axis('off')
-    plt.subplots_adjust(wspace=0.1, hspace=0.1)
-    plt.imshow(img)
-plt.show()
-
-
-
-'''
-_,_,dataloader = load_cifar10(1)
-for batch_it, (img, Y_batch) in enumerate(dataloader):
-    break
-
-
-def convert_to_imshow_format(image):
-    # first convert back to [0,1] range from [-1,1] range
-    print("imageshape", image.shape)
-    image = image / 2 + 0.5
-    image = image.detach().numpy()
-    # convert from CHW to HWC
-    # from 3x32x32 to 32x32x3
-    return image.transpose(1,2,0)
-
-
-
-dataiter = iter(dataloader)
-images, labels = dataiter.next()
-
-for idx, image in enumerate(images):
-    plt.imshow(convert_to_imshow_format(image))
+if task ==1:
+    for i in range(1, columns*rows +1):
+        #img =  pred[0][i].view(7, 7)
+        img =  pred[0][i-1].view(128,128)
+        fig.add_subplot(rows, columns, i)
+        plt.axis('off')
+        plt.subplots_adjust(wspace=0, hspace=0)
+        plt.imshow(img.detach().numpy())
     plt.show()
 
-#print(pred.shape)'''
+if task ==2:
+    for i in range(1, columns*rows +1):
+        #img =  pred[0][i].view(7, 7)
+        img =  pred[0][i-1].view(8, 8)
+        fig.add_subplot(rows, columns, i)
+        plt.axis('off')
+        plt.subplots_adjust(wspace=0.1, hspace=0.1)
+        plt.imshow(img.detach().numpy())
+    plt.show()
+
+#torchvision.utils.save_image(prediction, 'filters.png')
+if task==3:
+    for i in range(1, columns*rows +1):
+        #img =  pred[0][i].view(8, 8)
+        img =  pred[i-1].numpy().transpose(1,2,0)
+        fig.add_subplot(rows, columns, i)
+        plt.axis('off')
+        plt.subplots_adjust(wspace=0.1, hspace=0.1)
+        plt.imshow(img)
+    plt.show()
